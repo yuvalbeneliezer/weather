@@ -3,11 +3,26 @@ var router = express.Router();
 const DButils = require("../DButils");
 
 router.get("/data", function(req, res,next) {
+  try {
     const {lon, lat} = req.query;
-    DButils.execQuery(`SELECT * FROM dbo.weatherIndex WHERE Longitude = ${lon} and Latitude = ${lat}`)
-        .then((response) =>res.send(getJsonResponseForGetData(response)))
-        .catch((error) => console.log(error.message));
+    if (!lon || !lat) {
+      res.status(400).send({message: "Could not find lon and lat"});
+    }
+    res.app.get('connection').query(`SELECT * FROM weather.weather WHERE Longitude = ${lon} and Latitude = ${lat}`,
+        function (err, rows) {
+          if (err) {
+            res.send(err);
+          } else {
+            console.log(JSON.stringify(rows));
+            res.send(getJsonResponseForGetData(rows));
+          }
+        });
+  }
+  catch (error) {
+      next(error);
+  }
 });
+
 
 function getJsonResponseForGetData(response) {
   return response.map((response) => {
@@ -26,7 +41,7 @@ function getJsonResponseForGetData(response) {
 
 router.get("/summarize", function(req, res) {
   const {lon, lat} = req.query;
-  DButils.execQuery(`SELECT max(Temperature_Celsius) as max_Temperature ,min(Temperature_Celsius) as min_Temperature,avg(Temperature_Celsius) as avg_Temperature, max(Precipitation_Rate) as max_Precipitation ,min(Precipitation_Rate) as min_Precipitation,avg(Precipitation_Rate) as avg_Precipitation From dbo.weatherIndex WHERE Longitude = ${lon} and Latitude = ${lat}`)
+  DButils.execQuery(`SELECT max(Temperature_Celsius) as max_Temperature ,min(Temperature_Celsius) as min_Temperature,avg(Temperature_Celsius) as avg_Temperature, max(Precipitation_Rate) as max_Precipitation ,min(Precipitation_Rate) as min_Precipitation,avg(Precipitation_Rate) as avg_Precipitation From weather.weather WHERE Longitude = ${lon} and Latitude = ${lat}`)
       .then((response) =>res.send(getJsonResponseForSummarize(response)[0]))
       .catch((error) => console.log(error.message));
 });
