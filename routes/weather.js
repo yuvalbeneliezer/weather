@@ -68,29 +68,31 @@ avg(Precipitation_Rate) as avg_Precipitation From weather.weather WHERE Longitud
 });
 
 function getJsonResponseForSummarize(response) {
-  return response.map((response) => {
-    const {
-      max_Temperature: max_Temperature,
-      min_Temperature: min_Temperature,
-      avg_Temperature: avg_Temperature,
-      max_Precipitation: max_Precipitation,
-      min_Precipitation: min_Precipitation,
-      avg_Precipitation: avg_Precipitation
-    } = response;
+   let ans = response.map((response) => {
+       const {
+           max_Temperature: max_Temperature,
+           min_Temperature: min_Temperature,
+           avg_Temperature: avg_Temperature,
+           max_Precipitation: max_Precipitation,
+           min_Precipitation: min_Precipitation,
+           avg_Precipitation: avg_Precipitation
+       } = response;
     return {
-      max:{
-        Temperature: max_Temperature,
-        Precipitation: max_Precipitation,
-      },
-      min:{
-        Temperature: min_Temperature,
-        Precipitation: min_Precipitation,
-      },
-      avg:{
-        Temperature: avg_Temperature,
-        Precipitation: avg_Precipitation,
-      }
+        max: {
+            Temperature: max_Temperature ? max_Temperature : "",
+            Precipitation: max_Precipitation ? max_Precipitation : "",
+        },
+        min: {
+            Temperature: min_Temperature ? min_Temperature : "",
+            Precipitation: min_Precipitation ? min_Precipitation : "",
+        },
+        avg: {
+            Temperature: avg_Temperature ? avg_Temperature : "",
+            Precipitation: avg_Precipitation ? avg_Precipitation : "",
+        }
     };
-  });
+  })
+   return ans[0];
+
 }
 module.exports = router;
